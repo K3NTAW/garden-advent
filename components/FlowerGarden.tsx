@@ -15,7 +15,7 @@ export default function FlowerGarden() {
         className="bg-gradient-to-b from-sky-200 via-blue-100 to-green-50"
       >
         <Suspense fallback={null}>
-          <PerspectiveCamera makeDefault position={[0, 5, 10]} fov={50} />
+          <PerspectiveCamera makeDefault position={[0, 4, 7]} fov={55} />
           <ambientLight intensity={0.6} />
           <directionalLight
             position={[10, 10, 5]}
@@ -33,8 +33,8 @@ export default function FlowerGarden() {
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
-            minDistance={5}
-            maxDistance={30}
+            minDistance={3}
+            maxDistance={15}
             minPolarAngle={0}
             maxPolarAngle={Math.PI / 2.2}
           />

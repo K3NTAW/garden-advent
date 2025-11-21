@@ -5,10 +5,12 @@ A visually stunning, interactive 3D flower garden website built with Next.js, Re
 ## Features
 
 - **10 Different Flower Types**: Roses, Spider Lilies, Lavender, Foxgloves, Marigolds, Liatris, Rudbeckia, Peonies, Sunflowers, and Hydrangeas
+- **100+ Flowers**: Densely populated garden with flowers arranged in beautiful clusters
+- **Central Fountain**: Animated 3-tier fountain with water effects and decorative elements
+- **Garden Pathways**: Stone pathways leading from the fountain in multiple directions
 - **Interactive Animations**: Click any flower to see it bloom with unique animations
 - **Particle Effects**: Beautiful particle systems for pollen, petals, and sparkles
 - **3D Scene**: Immersive 3D garden with smooth camera controls
-- **Post-Processing**: Bloom and depth of field effects for enhanced visuals
 - **Responsive Design**: Works on desktop and mobile devices
 - **Smooth Performance**: Optimized for 60fps animations
 
@@ -77,8 +79,10 @@ flower-site/
 ├── components/             # React components
 │   ├── flowers/            # Individual flower components
 │   ├── FlowerGarden.tsx    # Main garden component
-│   ├── GardenScene.tsx     # 3D scene setup
+│   ├── GardenScene.tsx     # 3D scene setup with flowers, fountain, pathways
 │   ├── Ground.tsx          # Ground plane
+│   ├── Fountain.tsx        # Animated fountain with water effects
+│   ├── Pathway.tsx         # Stone pathway component
 │   ├── LoadingScreen.tsx   # Loading state
 │   └── ParticleEffect.tsx  # Particle system
 ├── lib/                    # Utility functions

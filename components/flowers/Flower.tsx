@@ -38,12 +38,14 @@ export default function Flower({ type, position, color, scale = 1 }: FlowerProps
 
   const FlowerComponent = FLOWER_COMPONENTS[type];
 
-  // Gentle swaying animation
+  // Gentle side-to-side swaying animation (wind effect) - no vertical movement
   useFrame((state) => {
     if (groupRef.current && !isAnimating) {
       const time = state.clock.elapsedTime;
-      groupRef.current.rotation.z = Math.sin(time * 0.5 + position[0]) * 0.05;
-      groupRef.current.position.y = position[1] + Math.sin(time * 0.8 + position[2]) * 0.1;
+      // Side-to-side rotation (like wind blowing)
+      groupRef.current.rotation.z = Math.sin(time * 0.5 + position[0] * 0.5) * 0.08;
+      // Keep Y position fixed - flowers are planted, not floating
+      groupRef.current.position.y = position[1];
     }
   });
 

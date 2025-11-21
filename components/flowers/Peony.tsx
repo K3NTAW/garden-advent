@@ -1,7 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRef } from "react";
 import { Group } from "three";
+import { createRoundedPetalGeometry } from "@/lib/flowerGeometries";
+import { createGlossyPetalMaterial, createStemMaterial, createLeafMaterial } from "@/lib/flowerMaterials";
+import { createLeafGeometry } from "@/lib/flowerGeometries";
 
 interface PeonyProps {
   color: string;
@@ -10,64 +14,74 @@ interface PeonyProps {
 export default function Peony({ color }: PeonyProps) {
   const groupRef = useRef<Group>(null);
 
-  const petalCount = 24;
-  const layers = 4;
+  const petalGeometry = useMemo(() => createRoundedPetalGeometry(0.1, 0.16), []);
+  const petalMaterial = useMemo(() => createGlossyPetalMaterial(color), [color]);
+  const stemMaterial = useMemo(() => createStemMaterial(), []);
+  const leafMaterial = useMemo(() => createLeafMaterial(), []);
+  const leafGeometry = useMemo(() => createLeafGeometry(0.12, 0.25), []);
+
+  const petalCount = 28;
+  const layers = 5;
 
   return (
     <group ref={groupRef}>
       {/* Stem */}
       <mesh position={[0, -0.4, 0]} castShadow>
         <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
-        <meshStandardMaterial color="#2d5016" />
+        <primitive object={stemMaterial} attach="material" />
       </mesh>
 
       {/* Leaves */}
-      {[0, 1, 2].map((i) => (
+      {[0, 1, 2, 3].map((i) => (
         <mesh
           key={i}
           position={[0, -0.3 + i * 0.15, 0]}
-          rotation={[0, (i / 3) * Math.PI * 2, Math.PI / 4]}
+          rotation={[0, (i / 4) * Math.PI * 2, Math.PI / 4]}
           castShadow
         >
-          <coneGeometry args={[0.12, 0.25, 3]} />
-          <meshStandardMaterial color="#4a7c2a" />
+          <primitive object={leafGeometry} attach="geometry" />
+          <primitive object={leafMaterial} attach="material" />
         </mesh>
       ))}
 
-      {/* Multiple layers of petals */}
-      {Array.from({ length: layers }).map((_, layer) => (
-        <group key={layer} position={[0, 0.2 + layer * 0.05, 0]}>
-          {Array.from({ length: petalCount }).map((_, i) => {
-            const angle = (i / petalCount) * Math.PI * 2;
-            const radius = 0.1 + layer * 0.04;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
+      {/* Multiple dense layers of petals - peony characteristic */}
+      {Array.from({ length: layers }).map((_, layer) => {
+        const layerPetalCount = petalCount - layer * 3;
+        const layerRadius = 0.08 + layer * 0.035;
+        const layerY = 0.15 + layer * 0.06;
+        const layerRotation = layer * 0.4;
 
-            return (
-              <mesh
-                key={i}
-                position={[x, 0, z]}
-                rotation={[0, angle, Math.PI / 6]}
-                castShadow
-              >
-                <sphereGeometry args={[0.06, 8, 8]} />
-                <meshStandardMaterial
-                  color={color}
-                  roughness={0.7}
-                  metalness={0.05}
-                />
-              </mesh>
-            );
-          })}
-        </group>
-      ))}
+        return (
+          <group key={layer} position={[0, layerY, 0]}>
+            {Array.from({ length: layerPetalCount }).map((_, i) => {
+              const angle = (i / layerPetalCount) * Math.PI * 2 + layerRotation;
+              const radius = layerRadius;
+              const x = Math.cos(angle) * radius;
+              const z = Math.sin(angle) * radius;
+              const petalAngle = angle;
+              const petalTilt = (layer / layers) * Math.PI / 3;
 
-      {/* Center */}
-      <mesh position={[0, 0.4, 0]} castShadow>
-        <sphereGeometry args={[0.04, 8, 8]} />
-        <meshStandardMaterial color="#fbbf24" />
+              return (
+                <mesh
+                  key={i}
+                  position={[x, 0, z]}
+                  rotation={[petalTilt, petalAngle, Math.PI / 8]}
+                  castShadow
+                >
+                  <primitive object={petalGeometry} attach="geometry" />
+                  <primitive object={petalMaterial} attach="material" />
+                </mesh>
+              );
+            })}
+          </group>
+        );
+      })}
+
+      {/* Center with stamens */}
+      <mesh position={[0, 0.5, 0]} castShadow>
+        <sphereGeometry args={[0.03, 8, 8]} />
+        <meshStandardMaterial color="#fbbf24" roughness={0.3} metalness={0.3} />
       </mesh>
     </group>
   );
 }
-

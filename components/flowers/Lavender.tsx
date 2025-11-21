@@ -1,7 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRef } from "react";
 import { Group } from "three";
+import { createSmallFlowerGeometry } from "@/lib/flowerGeometries";
+import { createPetalMaterial, createStemMaterial, createLeafMaterial } from "@/lib/flowerMaterials";
+import { createLeafGeometry } from "@/lib/flowerGeometries";
 
 interface LavenderProps {
   color: string;
@@ -10,35 +14,41 @@ interface LavenderProps {
 export default function Lavender({ color }: LavenderProps) {
   const groupRef = useRef<Group>(null);
 
-  const spikeCount = 8;
-  const flowersPerSpike = 12;
+  const flowerGeometry = useMemo(() => createSmallFlowerGeometry(0.025), []);
+  const flowerMaterial = useMemo(() => createPetalMaterial(color, { roughness: 0.5 }), [color]);
+  const stemMaterial = useMemo(() => createStemMaterial(), []);
+  const leafMaterial = useMemo(() => createLeafMaterial(), []);
+  const leafGeometry = useMemo(() => createLeafGeometry(0.08, 0.18), []);
+
+  const spikeCount = 10;
+  const flowersPerSpike = 15;
 
   return (
     <group ref={groupRef}>
       {/* Stem */}
       <mesh position={[0, -0.3, 0]} castShadow>
         <cylinderGeometry args={[0.01, 0.01, 0.6, 8]} />
-        <meshStandardMaterial color="#2d5016" />
+        <primitive object={stemMaterial} attach="material" />
       </mesh>
 
       {/* Leaves */}
-      {[0, 1].map((i) => (
+      {[0, 1, 2].map((i) => (
         <mesh
           key={i}
           position={[0, -0.2 + i * 0.15, 0]}
-          rotation={[0, (i * Math.PI) / 3, Math.PI / 6]}
+          rotation={[0, (i / 3) * Math.PI * 2, Math.PI / 6]}
           castShadow
         >
-          <coneGeometry args={[0.1, 0.2, 3]} />
-          <meshStandardMaterial color="#4a7c2a" />
+          <primitive object={leafGeometry} attach="geometry" />
+          <primitive object={leafMaterial} attach="material" />
         </mesh>
       ))}
 
-      {/* Flower spikes */}
+      {/* Flower spikes - more realistic clustering */}
       {Array.from({ length: spikeCount }).map((_, spikeIndex) => {
         const spikeY = 0.1 + (spikeIndex / spikeCount) * 0.4;
         const spikeAngle = (spikeIndex / spikeCount) * Math.PI * 2;
-        const spikeRadius = 0.05;
+        const spikeRadius = 0.04 + Math.random() * 0.02;
 
         return (
           <group
@@ -52,19 +62,17 @@ export default function Lavender({ color }: LavenderProps) {
             {Array.from({ length: flowersPerSpike }).map((_, flowerIndex) => {
               const flowerY = (flowerIndex / flowersPerSpike) * 0.3;
               const flowerAngle = (flowerIndex / flowersPerSpike) * Math.PI * 2;
+              const offset = (Math.random() - 0.5) * 0.01;
 
               return (
                 <mesh
                   key={flowerIndex}
-                  position={[0, flowerY, 0]}
+                  position={[offset, flowerY, offset]}
+                  rotation={[0, flowerAngle, 0]}
                   castShadow
                 >
-                  <sphereGeometry args={[0.02, 6, 6]} />
-                  <meshStandardMaterial
-                    color={color}
-                    roughness={0.4}
-                    metalness={0.1}
-                  />
+                  <primitive object={flowerGeometry} attach="geometry" />
+                  <primitive object={flowerMaterial} attach="material" />
                 </mesh>
               );
             })}
@@ -74,4 +82,3 @@ export default function Lavender({ color }: LavenderProps) {
     </group>
   );
 }
-
